@@ -35,23 +35,33 @@ def run_client_command(command_class: Type[Command], arguments: list[str]) -> An
     return result
 
 
+def receive_new_command(
+    server_socket: socket.socket,
+) -> tuple[socket.socket | None, str, list[str]]:
+    client_socket, client_address = server_socket.accept()
+    client_socket.settimeout(CLIENT_TIMEOUT_SECONDS)
+    print(f"Received new connection from {client_address}")
+    success, message = get_msg(client_socket)
+    if not success:
+        print(f"Received invalid message={message.decode()}")
+        send_msg(client_socket, "Invalid message sent")
+        client_socket.close()
+        return None, "", []
+
+    print(f"Received message={message.decode()}")
+    command_name, arguments = parse_command(message.decode())
+    return client_socket, command_name, arguments
+
+
 def main() -> None:
     server_socket = init_server_socket()
     done = False
 
     try:
         while not done:
-            client_socket, client_address = server_socket.accept()
-            client_socket.settimeout(CLIENT_TIMEOUT_SECONDS)
-            print(f"Received new connection from {client_address}")
-            success, message = get_msg(client_socket)
-            if not success:
-                print(f"Received invalid message={message.decode()}")
-                send_msg(client_socket, "Invalid message sent")
-                client_socket.close()
+            client_socket, command_name, arguments = receive_new_command(server_socket)
+            if client_socket is None:
                 continue
-            print(f"Received message={message.decode()}")
-            command_name, arguments = parse_command(message.decode())
 
             if command_name == "EXIT":
                 result = "Server shutting down..."
