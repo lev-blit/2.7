@@ -97,7 +97,8 @@ class EXECUTE(Command):
     def run(self) -> str:
         self.validate_pre_run()
         try:
-            print(f"{self.command=}")
+            # TODO: make this non-blocking so other clients will be able to connect while this is running?
+            #   might be for when we implement multi-client support
             exit_code = subprocess.call(self.command)
         except OSError as e:
             return str(e)
