@@ -52,7 +52,7 @@ def main() -> None:
                 continue
 
             try:
-                result = command_class(*arguments).run()
+                success, result = command_class(*arguments).run()
             except InvalidArgumentException as e:
                 send_msg(client_socket, str(e))
                 continue

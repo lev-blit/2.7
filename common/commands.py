@@ -21,6 +21,6 @@ class DIR(Command):
         if not os.path.isdir(self.path):
             raise InvalidArgumentException(f"The given path argument \"{self.path}\" is not a directory")
 
-    def run(self) -> list[str]:
+    def run(self) -> tuple[bool, list[str]]:
         self.validate_pre_run()
-        return glob.glob(fr"{self.path}\*.*")
+        return True, glob.glob(fr"{self.path}\*.*")

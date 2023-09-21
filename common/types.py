@@ -4,6 +4,7 @@ from typing import Any
 
 class Command(abc.ABC):
     def __init__(self, name: str, *args: Any) -> None:
+        # XXX: is this needed?
         self.name = name
 
     # TODO: is it any? or is it str?
@@ -26,5 +27,6 @@ class Command(abc.ABC):
         """
         raise NotImplementedError
 
-    def run(self) -> Any:
+    def run(self) -> tuple[bool, Any]:
+        """Runs the command and returns a tuple of [success, result]"""
         raise NotImplementedError
