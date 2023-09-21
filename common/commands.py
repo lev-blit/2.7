@@ -139,9 +139,8 @@ class TAKE_SCREENSHOT(Command):
 
     @classmethod
     def validate_argument_list(cls, *args: Any) -> None:
-        pass
-        # if not len(args) == 1:
-        #     raise InvalidArgumentListException("TAKE_SCREENSHOT only supports one argument")
+        if len(args) != 0:
+            raise InvalidArgumentListException("TAKE_SCREENSHOT doesn't accept arguments")
 
     @classmethod
     def help_message(cls) -> str:
