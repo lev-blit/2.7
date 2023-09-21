@@ -85,16 +85,9 @@ def main() -> None:
             result = run_client_command(command_class, arguments)
 
             if command_class is not None and command_class.MULTI_STAGED:
-                # TODO: prettier
-                def _send(msg: Any, sock=client_socket) -> None:
-                    send_msg(sock, msg)
-
-                def _send_no_length(msg: Any, sock=client_socket) -> None:
-                    send_msg(sock, msg, send_length=False)
-
                 command_class(*arguments).multi_stage_send(
-                    _send,
-                    _send_no_length,
+                    partial(send_msg, client_socket),
+                    partial(send_msg, client_socket, send_length=False),
                 )
             else:
                 send_msg(client_socket, result)
