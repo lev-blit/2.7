@@ -8,8 +8,13 @@ from common.protocol import get_msg, send_msg
 from common.types import Command
 
 
+# TODO: have this be configurable in env/as a cli argument
+CLIENT_TIMEOUT_SECONDS = 10
+
+
 def main() -> None:
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # TODO: have the port be configurable in env/as a cli argument
     server_socket.bind(("0.0.0.0", 8080))
     server_socket.listen()
 
@@ -18,8 +23,11 @@ def main() -> None:
     try:
         while not done:
             client_socket, client_address = server_socket.accept()
+            client_socket.settimeout(CLIENT_TIMEOUT_SECONDS)
+            print(f"Received new connection from {client_address}")
             success, message = get_msg(client_socket)
             if not success:
+                print(f"Received invalid {message=}")
                 send_msg(client_socket, "Invalid message sent")
                 client_socket.close()
                 continue
