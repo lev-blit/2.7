@@ -11,19 +11,24 @@ SERVER_IP = "127.0.0.1"
 SERVER_PORT = 8080
 
 
+def get_server_socket(ip: str, port: int) -> socket.socket:
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((ip, port))
+    return sock
+
+
 def main() -> None:
     done = False
-    sock = None
 
     try:
         while not done:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.connect((SERVER_IP, SERVER_PORT))
             message = input("Enter message: ")
             command_name, *arguments = message.split()
             # TODO: don't treat EXIT differently
             if command_name == "EXIT":
+                sock = get_server_socket(SERVER_IP, SERVER_PORT)
                 send_msg(sock, message)
+                sock.close()
                 done = True
                 continue
 
@@ -39,14 +44,14 @@ def main() -> None:
                 print(str(e))
                 continue
 
+            sock = get_server_socket(SERVER_IP, SERVER_PORT)
             send_msg(sock, message)
             success, response = get_msg(sock)
+            sock.close()
             print(response)
             done = not success
     finally:
         print("Exiting...")
-        sock.close()
-
 
 
 if __name__ == '__main__':
