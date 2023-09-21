@@ -34,28 +34,27 @@ def main() -> None:
             print(f"Received {message=}")
             command_name, arguments = parse_command(message)
 
-            # TODO: don't treat EXIT differently
             if command_name == "EXIT":
+                result = "Server shutting down..."
                 done = True
-                continue
+            else:
+                # TODO: extract this parsing to common.extract_command or something of the sorts
+                command_class: Type[Command] = getattr(commands, command_name.upper(), None)
+                if command_name.upper() != command_name or command_class is None:
+                    send_msg(client_socket, f"Received invalid command - {command_name}")
+                    continue
 
-            # TODO: extract this parsing to common.extract_command or something of the sorts
-            command_class: Type[Command] = getattr(commands, command_name.upper(), None)
-            if command_name.upper() != command_name or command_class is None:
-                send_msg(client_socket, f"Received invalid command - {command_name}")
-                continue
+                try:
+                    command_class.validate_argument_list(*arguments)
+                except InvalidArgumentListException as e:
+                    send_msg(client_socket, str(e))
+                    continue
 
-            try:
-                command_class.validate_argument_list(*arguments)
-            except InvalidArgumentListException as e:
-                send_msg(client_socket, str(e))
-                continue
-
-            try:
-                result = command_class(*arguments).run()
-            except InvalidArgumentException as e:
-                send_msg(client_socket, str(e))
-                continue
+                try:
+                    result = command_class(*arguments).run()
+                except InvalidArgumentException as e:
+                    send_msg(client_socket, str(e))
+                    continue
 
             send_msg(client_socket, result)
     finally:

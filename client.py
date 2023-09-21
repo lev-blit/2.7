@@ -24,32 +24,25 @@ def main() -> None:
         while not done:
             message = input("Enter message: ")
             command_name, arguments = parse_command(message)
-            # TODO: don't treat EXIT differently
-            if command_name == "EXIT":
-                sock = get_server_socket(SERVER_IP, SERVER_PORT)
-                send_msg(sock, message)
-                sock.close()
-                done = True
-                continue
+            if command_name != "EXIT":
+                # TODO: extract this parsing to common.extract_command or something of the sorts
+                command_class: Type[Command] = getattr(commands, command_name.upper(), None)
+                if command_name.upper() != command_name or command_class is None:
+                    print(f"Received invalid command - {command_name}")
+                    continue
 
-            # TODO: extract this parsing to common.extract_command or something of the sorts
-            command_class: Type[Command] = getattr(commands, command_name.upper(), None)
-            if command_name.upper() != command_name or command_class is None:
-                print(f"Received invalid command - {command_name}")
-                continue
-
-            try:
-                command_class.validate_argument_list(*arguments)
-            except InvalidArgumentListException as e:
-                print(str(e))
-                continue
+                try:
+                    command_class.validate_argument_list(*arguments)
+                except InvalidArgumentListException as e:
+                    print(str(e))
+                    continue
 
             sock = get_server_socket(SERVER_IP, SERVER_PORT)
             send_msg(sock, message)
             success, response = get_msg(sock)
             sock.close()
             print(response)
-            done = not success
+            done = command_name == "EXIT" or not success
     finally:
         print("Exiting...")
 
