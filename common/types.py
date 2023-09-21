@@ -22,6 +22,11 @@ class Command(abc.ABC):
         """
         raise NotImplementedError
 
+    @classmethod
+    @abc.abstractmethod
+    def help_message(cls) -> str:
+        raise NotImplementedError
+
     @abc.abstractmethod
     def validate_pre_run(self) -> None:
         """
