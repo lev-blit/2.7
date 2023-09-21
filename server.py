@@ -41,7 +41,7 @@ def main() -> None:
 
             # TODO: extract this parsing to common.extract_command or something of the sorts
             command_class: Type[Command] = getattr(commands, command_name.upper(), None)
-            if command_class is None:
+            if command_name.upper() != command_name or command_class is None:
                 send_msg(client_socket, f"Received invalid command - {command_name}")
                 continue
 
