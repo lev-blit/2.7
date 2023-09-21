@@ -34,6 +34,9 @@ def parse_command(message: str) -> tuple[str, list[str]]:
     Returns the command name and its arguments from the given message.
     If the message doesn't contain a valid command - will return an empty name and empty list of arguments.
     """
+    # TODO: given the string 'EXECUTE python -c "import sys; print(sys.version_info)", VVVV
+    #  return 'EXECUTE', ['python', '-c', 'import sys; print(sys.version_info)']
+    #  same with '' instead of ""
     split_message = message.split(" ")
     if len(split_message) == 0:
         return "", []

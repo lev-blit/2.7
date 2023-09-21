@@ -1,6 +1,7 @@
 import glob
 import os
 import shutil
+import subprocess
 from typing import Any
 
 from common.exceptions import InvalidArgumentException, InvalidArgumentListException
@@ -76,3 +77,28 @@ class COPY(Command):
         except OSError as e:
             return False, str(e)
         return True, f"Successfully {self.source} to {self.dest}"
+
+
+class EXECUTE(Command):
+    def __init__(self, *args: Any) -> None:
+        super().__init__("EXECUTE")
+        self.validate_argument_list(*args)
+        self.command = args
+
+    @classmethod
+    def validate_argument_list(cls, *args: Any) -> None:
+        if not len(args) >= 1:
+            raise InvalidArgumentListException("EXECUTE must have at least one argument")
+
+    def validate_pre_run(self) -> None:
+        # nothing to validate here
+        pass
+
+    def run(self) -> tuple[bool, str]:
+        self.validate_pre_run()
+        try:
+            print(f"{self.command=}")
+            exit_code = subprocess.call(self.command)
+        except OSError as e:
+            return False, str(e)
+        return True, f"{self.command} exited with exit code {exit_code}"
