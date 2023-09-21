@@ -9,6 +9,7 @@ class Command(abc.ABC):
 
     # TODO: is it any? or is it str?
     @classmethod
+    @abc.abstractmethod
     def validate_argument_list(cls, *args: Any) -> None:
         """
         A method to validate the argument list given the command.
@@ -18,15 +19,17 @@ class Command(abc.ABC):
         """
         raise NotImplementedError
 
+    @abc.abstractmethod
     def validate_pre_run(self) -> None:
         """
         A method to validate to specific arguments and not just their amount and type.
-        This should be used only when running the command, while `validate_argument_list` can be used to validate the
-        command on clients before sending it a server to execute.
+        This should be used only when running the command, while `validate_argument_list` can be
+        used to validate the command on clients before sending it a server to execute.
         This method should only be run on a server, before calling the `run` method.
         """
         raise NotImplementedError
 
+    @abc.abstractmethod
     def run(self) -> Any:
         """Runs the command and returns a tuple of [success, result]"""
         raise NotImplementedError

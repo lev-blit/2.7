@@ -4,7 +4,8 @@ import shutil
 import subprocess
 from typing import Any
 
-from common.exceptions import InvalidArgumentException, InvalidArgumentListException
+from common.exceptions import InvalidArgumentException
+from common.exceptions import InvalidArgumentListException
 from common.types import Command
 
 
@@ -103,7 +104,7 @@ class EXECUTE(Command):
     def run(self) -> str:
         self.validate_pre_run()
         try:
-            # TODO: make this non-blocking so other clients will be able to connect while this is running?
+            # TODO: make this non-blocking so other clients will be able to connect while this is running?  # noqa: E501
             #   might be for when we implement multi-client support
             exit_code = subprocess.call(self.command)
         except OSError as e:

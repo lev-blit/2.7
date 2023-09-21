@@ -1,6 +1,7 @@
 import socket
 from types import ModuleType
-from typing import Callable, Type
+from typing import Callable
+from typing import Type
 
 from common.exceptions import InvalidArgumentListException
 from common.types import Command
@@ -37,7 +38,8 @@ def send_msg(s: socket.socket, msg: str) -> None:
 def parse_command(message: str) -> tuple[str, list[str]]:
     """
     Returns the command name and its arguments from the given message.
-    If the message doesn't contain a valid command - will return an empty name and empty list of arguments.
+    If the message doesn't contain a valid command -
+    will return an empty name and empty list of arguments.
     """
     # TODO: given the string 'EXECUTE python -c "import sys; print(sys.version_info)", VVVV
     #  return 'EXECUTE', ['python', '-c', 'import sys; print(sys.version_info)']

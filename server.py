@@ -1,11 +1,17 @@
 import socket
-from typing import Any, Type
+from functools import partial
+from typing import Any
+from typing import Type
 
-# TODO: change to relative/package? have a common package?
 from common import commands
 from common.exceptions import InvalidArgumentException
-from common.protocol import get_msg, send_msg, parse_command, validate_command
+from common.protocol import get_msg
+from common.protocol import parse_command
+from common.protocol import send_msg
+from common.protocol import validate_command
 from common.types import Command
+
+# TODO: change to relative/package? have a common package?
 
 
 # TODO: have this be configurable in env/as a cli argument
@@ -55,8 +61,8 @@ def main() -> None:
                     command_name,
                     commands,
                     arguments,
-                    invalid_command_callback=lambda error_msg: send_msg(client_socket, error_msg),
-                    invalid_arguments_callback=lambda error_msg: send_msg(client_socket, error_msg),
+                    invalid_command_callback=partial(send_msg, client_socket),
+                    invalid_arguments_callback=partial(send_msg, client_socket),
                 )
                 if not valid_command or command_class is None:
                     continue
