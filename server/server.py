@@ -53,6 +53,10 @@ def receive_new_command(
     return client_socket, command_name, arguments
 
 
+def handle_exit(client_socket: socket.socket) -> None:
+    send_msg(client_socket, "Server shutting down...")
+
+
 def main() -> None:
     server_socket = init_server_socket()
     done = False
@@ -64,21 +68,21 @@ def main() -> None:
                 continue
 
             if command_name == "EXIT":
-                result = "Server shutting down..."
-                command_class = None
+                handle_exit(client_socket)
                 done = True
-            else:
-                valid_command, command_class = validate_command(
-                    command_name,
-                    commands,
-                    arguments,
-                    invalid_command_callback=partial(send_msg, client_socket),
-                    invalid_arguments_callback=partial(send_msg, client_socket),
-                )
-                if not valid_command or command_class is None:
-                    continue
+                continue
 
-                result = run_client_command(command_class, arguments)
+            valid_command, command_class = validate_command(
+                command_name,
+                commands,
+                arguments,
+                invalid_command_callback=partial(send_msg, client_socket),
+                invalid_arguments_callback=partial(send_msg, client_socket),
+            )
+            if not valid_command or command_class is None:
+                continue
+
+            result = run_client_command(command_class, arguments)
 
             if command_class is not None and command_class.MULTI_STAGED:
                 # TODO: prettier
