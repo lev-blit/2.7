@@ -21,11 +21,13 @@ class DIR(Command):
 
     def validate_pre_run(self) -> None:
         if not os.path.isdir(self.path):
-            raise InvalidArgumentException(f"The given path argument \"{self.path}\" is not a directory")
+            raise InvalidArgumentException(
+                f'The given path argument "{self.path}" is not a directory'
+            )
 
     def run(self) -> list[str]:
         self.validate_pre_run()
-        return glob.glob(fr"{self.path}\*.*")
+        return glob.glob(rf"{self.path}\*.*")
 
 
 class DELETE(Command):
@@ -41,7 +43,7 @@ class DELETE(Command):
 
     def validate_pre_run(self) -> None:
         if not os.path.isfile(self.path):
-            raise InvalidArgumentException(f"The given path argument \"{self.path}\" is not a file")
+            raise InvalidArgumentException(f'The given path argument "{self.path}" is not a file')
 
     def run(self) -> str:
         self.validate_pre_run()
@@ -64,11 +66,15 @@ class COPY(Command):
             raise InvalidArgumentListException("COPY only supports two arguments")
         source, dest = args
         if source == dest:
-            raise InvalidArgumentListException("Dest argument must be different from source argument")
+            raise InvalidArgumentListException(
+                "Dest argument must be different from source argument"
+            )
 
     def validate_pre_run(self) -> None:
         if not os.path.isfile(self.source):
-            raise InvalidArgumentException(f"The given source argument \"{self.source}\" is not a file")
+            raise InvalidArgumentException(
+                f'The given source argument "{self.source}" is not a file'
+            )
 
     def run(self) -> str:
         self.validate_pre_run()

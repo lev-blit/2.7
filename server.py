@@ -61,12 +61,8 @@ def main() -> None:
                     command_name,
                     commands,
                     arguments,
-                    invalid_command_callback=lambda error_msg: send_msg(
-                        client_socket, error_msg
-                    ),
-                    invalid_arguments_callback=lambda error_msg: send_msg(
-                        client_socket, error_msg
-                    ),
+                    invalid_command_callback=lambda error_msg: send_msg(client_socket, error_msg),
+                    invalid_arguments_callback=lambda error_msg: send_msg(client_socket, error_msg),
                 )
                 if not valid_command:
                     continue
