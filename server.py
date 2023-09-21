@@ -1,7 +1,11 @@
 import socket
+from typing import Type
 
 # TODO: change to relative/package? have a common package?
+from common import commands
+from common.exceptions import InvalidArgumentListException, InvalidArgumentException
 from common.protocol import get_msg, send_msg
+from common.types import Command
 
 
 def main() -> None:
@@ -20,10 +24,34 @@ def main() -> None:
                 client_socket.close()
                 continue
             print(f"Received {message=}")
-            send_msg(client_socket, f"Received {message=}")
-            if message == "EXIT":
+            command_name, *arguments = message.split()
+
+            # TODO: don't treat EXIT differently
+            if command_name == "EXIT":
                 done = True
+                continue
+
+            # TODO: extract this parsing to common.extract_command or something of the sorts
+            command_class: Type[Command] = getattr(commands, command_name, None)
+            if command_class is None:
+                send_msg(client_socket, f"Received invalid command - {command_name}")
+                continue
+
+            try:
+                command_class.validate_argument_list(*arguments)
+            except InvalidArgumentListException as e:
+                send_msg(client_socket, str(e))
+                continue
+
+            try:
+                result = command_class(*arguments).run()
+            except InvalidArgumentException as e:
+                send_msg(client_socket, str(e))
+                continue
+
+            send_msg(client_socket, result)
     finally:
+        print("Exiting...")
         server_socket.close()
 
 

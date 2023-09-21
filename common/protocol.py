@@ -16,6 +16,6 @@ def get_msg(s: socket.socket) -> tuple[bool, str]:
 
 
 def send_msg(s: socket.socket, msg: str) -> None:
-    length = len(msg)
+    length = len(str(msg))
     length_str = str(length).zfill(4)
     s.send(f"{length_str}{msg}".encode())
