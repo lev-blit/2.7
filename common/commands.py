@@ -20,7 +20,7 @@ class DIR(Command):
 
     @classmethod
     def validate_argument_list(cls, *args: Any) -> None:
-        if not len(args) == 1:
+        if len(args) != 1:
             raise InvalidArgumentListException("DIR only supports one argument")
 
     @classmethod
@@ -46,7 +46,7 @@ class DELETE(Command):
 
     @classmethod
     def validate_argument_list(cls, *args: Any) -> None:
-        if not len(args) == 1:
+        if len(args) != 1:
             raise InvalidArgumentListException("DELETE only supports one argument")
 
     @classmethod
@@ -74,7 +74,7 @@ class COPY(Command):
 
     @classmethod
     def validate_argument_list(cls, *args: Any) -> None:
-        if not len(args) == 2:
+        if len(args) != 2:
             raise InvalidArgumentListException("COPY only supports two arguments")
         source, dest = args
         if source == dest:
@@ -109,7 +109,7 @@ class EXECUTE(Command):
 
     @classmethod
     def validate_argument_list(cls, *args: Any) -> None:
-        if not len(args) >= 1:
+        if len(args) < 1:
             raise InvalidArgumentListException("EXECUTE must have at least one argument")
 
     @classmethod
@@ -171,7 +171,7 @@ class SEND_FILE(Command):
 
     @classmethod
     def validate_argument_list(cls, *args: Any) -> None:
-        if not len(args) == 2:
+        if len(args) != 2:
             raise InvalidArgumentListException("SEND_FILE only supports two arguments")
 
     @classmethod
