@@ -51,6 +51,8 @@ def main() -> None:
             sock.close()
             print(response.decode())
             done = command_name == "EXIT" or not success
+    except ConnectionError as e:
+        print(f"Couldn't connect to server - {e}")
     finally:
         print("Exiting...")
 
