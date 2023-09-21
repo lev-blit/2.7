@@ -33,7 +33,7 @@ def main() -> None:
                 continue
 
             # TODO: extract this parsing to common.extract_command or something of the sorts
-            command_class: Type[Command] = getattr(commands, command_name, None)
+            command_class: Type[Command] = getattr(commands, command_name.upper(), None)
             if command_class is None:
                 print(f"Received invalid command - {command_name}")
                 continue
