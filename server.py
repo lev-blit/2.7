@@ -4,7 +4,7 @@ from typing import Type
 # TODO: change to relative/package? have a common package?
 from common import commands
 from common.exceptions import InvalidArgumentListException, InvalidArgumentException
-from common.protocol import get_msg, send_msg
+from common.protocol import get_msg, send_msg, parse_command
 from common.types import Command
 
 
@@ -32,7 +32,7 @@ def main() -> None:
                 client_socket.close()
                 continue
             print(f"Received {message=}")
-            command_name, *arguments = message.split()
+            command_name, arguments = parse_command(message)
 
             # TODO: don't treat EXIT differently
             if command_name == "EXIT":

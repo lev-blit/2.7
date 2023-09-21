@@ -3,7 +3,7 @@ from typing import Type
 
 from common import commands
 from common.exceptions import InvalidArgumentListException
-from common.protocol import get_msg, send_msg
+from common.protocol import get_msg, send_msg, parse_command
 from common.types import Command
 
 # TODO: have this be an arg to running the client to be able to control which server to connect to
@@ -23,7 +23,7 @@ def main() -> None:
     try:
         while not done:
             message = input("Enter message: ")
-            command_name, *arguments = message.split()
+            command_name, arguments = parse_command(message)
             # TODO: don't treat EXIT differently
             if command_name == "EXIT":
                 sock = get_server_socket(SERVER_IP, SERVER_PORT)

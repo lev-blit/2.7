@@ -27,3 +27,15 @@ def send_msg(s: socket.socket, msg: str) -> None:
     length = len(str(msg))
     length_str = str(length).zfill(4)
     s.send(f"{length_str}{msg}".encode())
+
+
+def parse_command(message: str) -> tuple[str, list[str]]:
+    """
+    Returns the command name and its arguments from the given message.
+    If the message doesn't contain a valid command - will return an empty name and empty list of arguments.
+    """
+    split_message = message.split(" ")
+    if len(split_message) == 0:
+        return "", []
+    command_name, *arguments = split_message
+    return command_name, arguments
