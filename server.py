@@ -1,5 +1,5 @@
 import socket
-from typing import Type
+from typing import Any, Type
 
 # TODO: change to relative/package? have a common package?
 from common import commands
@@ -21,18 +21,12 @@ def init_server_socket() -> socket.socket:
     return server_socket
 
 
-def run_client_command(
-    command_class: Type[Command], arguments: list[str], client_socket: socket.socket
-) -> None:
+def run_client_command(command_class: Type[Command], arguments: list[str]) -> Any:
     try:
         result = command_class(*arguments).run()
     except InvalidArgumentException as e:
-        send_msg(client_socket, str(e))
-        return
-    else:
-        send_msg(client_socket, result)
-    finally:
-        client_socket.close()
+        result = str(e)
+    return result
 
 
 def main() -> None:
@@ -64,10 +58,11 @@ def main() -> None:
                     invalid_command_callback=lambda error_msg: send_msg(client_socket, error_msg),
                     invalid_arguments_callback=lambda error_msg: send_msg(client_socket, error_msg),
                 )
-                if not valid_command:
+                if not valid_command or command_class is None:
                     continue
 
-                run_client_command(command_class, arguments, client_socket)
+                result = run_client_command(command_class, arguments)
+            send_msg(client_socket, result)
 
     finally:
         print("Exiting...")

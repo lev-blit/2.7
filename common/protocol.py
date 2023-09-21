@@ -57,7 +57,7 @@ def validate_command(
     invalid_command_callback: Callable[[str], None],
     invalid_arguments_callback: Callable[[str], None],
 ) -> tuple[bool, Type[Command] | None]:
-    command_class: Type[Command] = getattr(commands_module, command_name.upper(), None)
+    command_class: Type[Command] | None = getattr(commands_module, command_name.upper(), None)
     if command_name.upper() != command_name or command_class is None:
         invalid_command_callback(f"Received invalid command - {command_name}")
         return False, None
