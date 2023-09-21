@@ -1,10 +1,7 @@
 import socket
-from typing import Type
 
 from common import commands
-from common.exceptions import InvalidArgumentListException
-from common.protocol import get_msg, send_msg, parse_command
-from common.types import Command
+from common.protocol import get_msg, send_msg, parse_command, validate_command
 
 # TODO: have this be an arg to running the client to be able to control which server to connect to
 SERVER_IP = "127.0.0.1"
@@ -25,16 +22,14 @@ def main() -> None:
             message = input("Enter message: ")
             command_name, arguments = parse_command(message)
             if command_name != "EXIT":
-                # TODO: extract this parsing to common.extract_command or something of the sorts
-                command_class: Type[Command] = getattr(commands, command_name.upper(), None)
-                if command_name.upper() != command_name or command_class is None:
-                    print(f"Received invalid command - {command_name}")
-                    continue
-
-                try:
-                    command_class.validate_argument_list(*arguments)
-                except InvalidArgumentListException as e:
-                    print(str(e))
+                valid_command, _command_class = validate_command(
+                    command_name,
+                    commands,
+                    arguments,
+                    invalid_command_callback=print,
+                    invalid_arguments_callback=print,
+                )
+                if not valid_command:
                     continue
 
             sock = get_server_socket(SERVER_IP, SERVER_PORT)

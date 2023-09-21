@@ -1,11 +1,9 @@
 import socket
-from typing import Type
 
 # TODO: change to relative/package? have a common package?
 from common import commands
-from common.exceptions import InvalidArgumentListException, InvalidArgumentException
-from common.protocol import get_msg, send_msg, parse_command
-from common.types import Command
+from common.exceptions import InvalidArgumentException
+from common.protocol import get_msg, send_msg, parse_command, validate_command
 
 
 # TODO: have this be configurable in env/as a cli argument
@@ -38,16 +36,14 @@ def main() -> None:
                 result = "Server shutting down..."
                 done = True
             else:
-                # TODO: extract this parsing to common.extract_command or something of the sorts
-                command_class: Type[Command] = getattr(commands, command_name.upper(), None)
-                if command_name.upper() != command_name or command_class is None:
-                    send_msg(client_socket, f"Received invalid command - {command_name}")
-                    continue
-
-                try:
-                    command_class.validate_argument_list(*arguments)
-                except InvalidArgumentListException as e:
-                    send_msg(client_socket, str(e))
+                valid_command, command_class = validate_command(
+                    command_name,
+                    commands,
+                    arguments,
+                    invalid_command_callback=lambda error_msg: send_msg(client_socket, error_msg),
+                    invalid_arguments_callback=lambda error_msg: send_msg(client_socket, error_msg),
+                )
+                if not valid_command:
                     continue
 
                 try:

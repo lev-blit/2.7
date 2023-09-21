@@ -1,4 +1,9 @@
 import socket
+from types import ModuleType
+from typing import Callable, Type
+
+from common.exceptions import InvalidArgumentListException
+from common.types import Command
 
 
 def _try_recv_until_timeout(s: socket.socket, amount: int) -> tuple[bool, bytes]:
@@ -42,3 +47,25 @@ def parse_command(message: str) -> tuple[str, list[str]]:
         return "", []
     command_name, *arguments = split_message
     return command_name, arguments
+
+
+def validate_command(
+    command_name: str,
+    commands_module: ModuleType,
+    arguments: list[str],
+    *,
+    invalid_command_callback: Callable[[str], None],
+    invalid_arguments_callback: Callable[[str], None],
+) -> tuple[bool, Type[Command] | None]:
+    command_class: Type[Command] = getattr(commands_module, command_name.upper(), None)
+    if command_name.upper() != command_name or command_class is None:
+        invalid_command_callback(f"Received invalid command - {command_name}")
+        return False, None
+
+    try:
+        command_class.validate_argument_list(*arguments)
+    except InvalidArgumentListException as e:
+        invalid_arguments_callback(str(e))
+        return False, command_class
+
+    return True, command_class
