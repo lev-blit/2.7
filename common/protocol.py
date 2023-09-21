@@ -16,7 +16,7 @@ def get_msg(s: socket.socket) -> tuple[bool, str]:
     if not success or not length_str.isdigit():
         # TODO: return invalid length received
         # TODO: cleanup socket?
-        return False, "Error"
+        return False, length_str
 
     length = int(length_str)
     success, message = _try_recv_until_timeout(s, length)
