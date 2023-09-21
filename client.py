@@ -1,6 +1,6 @@
 import socket
 
-from protocol import get_msg, send_msg
+from common.protocol import get_msg, send_msg
 
 # TODO: have this be an arg to running the client to be able to control which server to connect to
 SERVER_IP = "127.0.0.1"

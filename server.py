@@ -1,7 +1,7 @@
 import socket
 
 # TODO: change to relative/package? have a common package?
-from protocol import get_msg, send_msg
+from common.protocol import get_msg, send_msg
 
 
 def main() -> None:
