@@ -3,6 +3,9 @@ import os
 import shutil
 import subprocess
 from typing import Any
+from typing import Callable
+
+import pyautogui
 
 from common.exceptions import InvalidArgumentException
 from common.exceptions import InvalidArgumentListException
@@ -110,3 +113,82 @@ class EXECUTE(Command):
         except OSError as e:
             return str(e)
         return f"{self.command} exited with exit code {exit_code}"
+
+
+class TAKE_SCREENSHOT(Command):
+    def __init__(self, *args: Any) -> None:
+        super().__init__("TAKE_SCREENSHOT")
+        self.validate_argument_list(*args)
+        self.screenshot_path = "screenshot.jpg"
+
+    @classmethod
+    def validate_argument_list(cls, *args: Any) -> None:
+        pass
+        # if not len(args) == 1:
+        #     raise InvalidArgumentListException("TAKE_SCREENSHOT only supports one argument")
+
+    def validate_pre_run(self) -> None:
+        # nothing to validate here
+        pass
+
+    def run(self) -> str:
+        self.validate_pre_run()
+        try:
+            pyautogui.screenshot(self.screenshot_path)
+        except Exception as e:
+            return f"Failed to save screenshot - {e!r}"
+        else:
+            return f"Screenshot saved to {self.screenshot_path}"
+
+
+class SEND_FILE(Command):
+    MULTI_STAGED = True
+
+    def __init__(self, *args: Any) -> None:
+        super().__init__("SEND_FILE")
+        self.validate_argument_list(*args)
+        self.source, self.dest = args
+        self.file_size: int = -1
+
+    @classmethod
+    def validate_argument_list(cls, *args: Any) -> None:
+        if not len(args) == 2:
+            raise InvalidArgumentListException("SEND_FILE only supports two arguments")
+
+    def validate_pre_run(self) -> None:
+        if not os.path.isfile(self.source):
+            raise InvalidArgumentException(
+                f'The given source argument "{self.source}" is not a file'
+            )
+
+    def run(self) -> None:
+        pass
+
+    # TODO: name this properly
+    def multi_stage_send(
+        self,
+        send_with_len_callback: Callable[[Any], None],
+        pure_send_callback: Callable[[Any], None],
+    ) -> None:
+        send_with_len_callback(str(os.path.getsize(self.source)))
+        with open(self.source, "rb") as f:
+            pure_send_callback(f.read())
+
+    def multi_stage_recv(
+        self,
+        get_msg_callback: Callable[[], tuple[bool, bytes]],
+        recv_callback: Callable[[int], tuple[bool, bytes]],
+    ) -> tuple[bool, bytes]:
+        success, length = get_msg_callback()
+        if not success:
+            return False, b"Failed receiving response from server"
+        if not length.isdigit():
+            return False, b"Received invalid response from server about file size"
+
+        success, file_data = recv_callback(int(length))
+        if not success:
+            return False, b"Received invalid response from server about file data"
+
+        with open(self.dest, "wb") as f:
+            f.write(file_data)
+        return True, f"Successfully saved file to {self.dest}".encode()

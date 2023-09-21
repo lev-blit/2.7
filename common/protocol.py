@@ -1,5 +1,6 @@
 import socket
 from types import ModuleType
+from typing import Any
 from typing import Callable
 from typing import Type
 
@@ -15,9 +16,8 @@ def _try_recv_until_timeout(s: socket.socket, amount: int) -> tuple[bool, bytes]
     return True, msg
 
 
-def get_msg(s: socket.socket) -> tuple[bool, str]:
-    success, length_bytes = _try_recv_until_timeout(s, 4)
-    length_str = length_bytes.decode()
+def get_msg(s: socket.socket) -> tuple[bool, bytes]:
+    success, length_str = recv_custom_amount(s, 4)
 
     if not success or not length_str.isdigit():
         # TODO: return invalid length received
@@ -25,14 +25,23 @@ def get_msg(s: socket.socket) -> tuple[bool, str]:
         return False, length_str
 
     length = int(length_str)
-    success, message = _try_recv_until_timeout(s, length)
-    return success, message.decode()
+    return recv_custom_amount(s, length)
 
 
-def send_msg(s: socket.socket, msg: str) -> None:
-    length = len(str(msg))
-    length_str = str(length).zfill(4)
-    s.send(f"{length_str}{msg}".encode())
+def recv_custom_amount(s: socket.socket, amount: int) -> tuple[bool, bytes]:
+    success, message = _try_recv_until_timeout(s, amount)
+    return success, message
+
+
+def send_msg(s: socket.socket, msg: Any, *, send_length: bool = True) -> None:
+    msg_to_send = msg if isinstance(msg, bytes) else str(msg).encode()
+    if not send_length:
+        s.send(msg_to_send)
+        return
+
+    length = len(msg_to_send)
+    length_to_send = str(length).zfill(4).encode()
+    s.send(length_to_send + msg_to_send)
 
 
 def parse_command(message: str) -> tuple[str, list[str]]:
