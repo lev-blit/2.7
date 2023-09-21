@@ -27,6 +27,6 @@ class Command(abc.ABC):
         """
         raise NotImplementedError
 
-    def run(self) -> tuple[bool, Any]:
+    def run(self) -> Any:
         """Runs the command and returns a tuple of [success, result]"""
         raise NotImplementedError

@@ -23,9 +23,9 @@ class DIR(Command):
         if not os.path.isdir(self.path):
             raise InvalidArgumentException(f"The given path argument \"{self.path}\" is not a directory")
 
-    def run(self) -> tuple[bool, list[str]]:
+    def run(self) -> list[str]:
         self.validate_pre_run()
-        return True, glob.glob(fr"{self.path}\*.*")
+        return glob.glob(fr"{self.path}\*.*")
 
 
 class DELETE(Command):
@@ -43,13 +43,13 @@ class DELETE(Command):
         if not os.path.isfile(self.path):
             raise InvalidArgumentException(f"The given path argument \"{self.path}\" is not a file")
 
-    def run(self) -> tuple[bool, str]:
+    def run(self) -> str:
         self.validate_pre_run()
         try:
             os.remove(self.path)
         except OSError as e:
-            return False, str(e)
-        return True, f"Successfully deleted {self.path}"
+            return str(e)
+        return f"Successfully deleted {self.path}"
 
 
 class COPY(Command):
@@ -70,13 +70,13 @@ class COPY(Command):
         if not os.path.isfile(self.source):
             raise InvalidArgumentException(f"The given source argument \"{self.source}\" is not a file")
 
-    def run(self) -> tuple[bool, str]:
+    def run(self) -> str:
         self.validate_pre_run()
         try:
             shutil.copy(self.source, self.dest)
         except OSError as e:
-            return False, str(e)
-        return True, f"Successfully {self.source} to {self.dest}"
+            return str(e)
+        return f"Successfully {self.source} to {self.dest}"
 
 
 class EXECUTE(Command):
@@ -94,11 +94,11 @@ class EXECUTE(Command):
         # nothing to validate here
         pass
 
-    def run(self) -> tuple[bool, str]:
+    def run(self) -> str:
         self.validate_pre_run()
         try:
             print(f"{self.command=}")
             exit_code = subprocess.call(self.command)
         except OSError as e:
-            return False, str(e)
-        return True, f"{self.command} exited with exit code {exit_code}"
+            return str(e)
+        return f"{self.command} exited with exit code {exit_code}"
