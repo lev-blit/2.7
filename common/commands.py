@@ -184,9 +184,11 @@ class SEND_FILE(Command):
             return False, b"Failed receiving response from server"
         if not length.isdigit():
             return False, b"Received invalid response from server about file size"
+
         success, file_data = recv_callback(int(length))
         if not success:
             return False, b"Received invalid response from server about file data"
+
         with open(self.dest, "wb") as f:
             f.write(file_data)
         return True, f"Successfully saved file to {self.dest}".encode()
