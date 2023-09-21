@@ -1,8 +1,11 @@
 import abc
 from typing import Any
+from typing import Callable
 
 
 class Command(abc.ABC):
+    MULTI_STAGED = False
+
     def __init__(self, name: str, *args: Any) -> None:
         # XXX: is this needed?
         self.name = name
@@ -33,3 +36,21 @@ class Command(abc.ABC):
     def run(self) -> Any:
         """Runs the command and returns a tuple of [success, result]"""
         raise NotImplementedError
+
+    if MULTI_STAGED:
+
+        @abc.abstractmethod
+        def multi_stage_send(
+            self,
+            send_with_len_callback: Callable[[Any], None],
+            pure_send_callback: Callable[[Any], None],
+        ) -> Any:
+            raise NotImplementedError
+
+        @abc.abstractmethod
+        def multi_stage_recv(
+            self,
+            get_msg_callback: Callable[[], tuple[bool, bytes]],
+            recv_callback: Callable[[int], tuple[bool, bytes]],
+        ) -> tuple[bool, bytes]:
+            raise NotImplementedError

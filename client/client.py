@@ -1,8 +1,10 @@
 import socket
+from functools import partial
 
 from common import commands
 from common.protocol import get_msg
 from common.protocol import parse_command
+from common.protocol import recv_custom_amount
 from common.protocol import send_msg
 from common.protocol import validate_command
 
@@ -25,7 +27,7 @@ def main() -> None:
             message = input("Enter message: ")
             command_name, arguments = parse_command(message)
             if command_name != "EXIT":
-                valid_command, _command_class = validate_command(
+                valid_command, command_class = validate_command(
                     command_name,
                     commands,
                     arguments,
@@ -34,12 +36,20 @@ def main() -> None:
                 )
                 if not valid_command:
                     continue
+            else:
+                command_class = None
 
             sock = get_server_socket(SERVER_IP, SERVER_PORT)
             send_msg(sock, message)
-            success, response = get_msg(sock)
+            if command_class is not None and command_class.MULTI_STAGED:
+                success, response = command_class(*arguments).multi_stage_recv(
+                    partial(get_msg, sock),
+                    partial(recv_custom_amount, sock),
+                )
+            else:
+                success, response = get_msg(sock)
             sock.close()
-            print(response)
+            print(response.decode())
             done = command_name == "EXIT" or not success
     finally:
         print("Exiting...")

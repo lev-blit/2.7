@@ -46,15 +46,16 @@ def main() -> None:
             print(f"Received new connection from {client_address}")
             success, message = get_msg(client_socket)
             if not success:
-                print(f"Received invalid {message=}")
+                print(f"Received invalid message={message.decode()}")
                 send_msg(client_socket, "Invalid message sent")
                 client_socket.close()
                 continue
-            print(f"Received {message=}")
-            command_name, arguments = parse_command(message)
+            print(f"Received message={message.decode()}")
+            command_name, arguments = parse_command(message.decode())
 
             if command_name == "EXIT":
                 result = "Server shutting down..."
+                command_class = None
                 done = True
             else:
                 valid_command, command_class = validate_command(
@@ -68,7 +69,21 @@ def main() -> None:
                     continue
 
                 result = run_client_command(command_class, arguments)
-            send_msg(client_socket, result)
+
+            if command_class is not None and command_class.MULTI_STAGED:
+                # TODO: prettier
+                def _send(msg: Any, sock=client_socket) -> None:
+                    send_msg(sock, msg)
+
+                def _send_no_length(msg: Any, sock=client_socket) -> None:
+                    send_msg(sock, msg, send_length=False)
+
+                command_class(*arguments).multi_stage_send(
+                    _send,
+                    _send_no_length,
+                )
+            else:
+                send_msg(client_socket, result)
 
     finally:
         print("Exiting...")
