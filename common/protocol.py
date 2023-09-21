@@ -76,7 +76,7 @@ def validate_command(
     try:
         command_class.validate_argument_list(*arguments)
     except InvalidArgumentListException as e:
-        invalid_arguments_callback(str(e))
+        invalid_arguments_callback(f"{e}\n{command_class.help_message()}")
         return False, command_class
 
     return True, command_class

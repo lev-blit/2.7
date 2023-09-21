@@ -23,6 +23,10 @@ class DIR(Command):
         if not len(args) == 1:
             raise InvalidArgumentListException("DIR only supports one argument")
 
+    @classmethod
+    def help_message(cls) -> str:
+        return "Usage: DIR {directory_name}"
+
     def validate_pre_run(self) -> None:
         if not os.path.isdir(self.path):
             raise InvalidArgumentException(
@@ -44,6 +48,10 @@ class DELETE(Command):
     def validate_argument_list(cls, *args: Any) -> None:
         if not len(args) == 1:
             raise InvalidArgumentListException("DELETE only supports one argument")
+
+    @classmethod
+    def help_message(cls) -> str:
+        return "Usage: DELETE {file_name}"
 
     def validate_pre_run(self) -> None:
         if not os.path.isfile(self.path):
@@ -74,6 +82,10 @@ class COPY(Command):
                 "Dest argument must be different from source argument"
             )
 
+    @classmethod
+    def help_message(cls) -> str:
+        return "Usage: COPY {src_file} {dst_location}"
+
     def validate_pre_run(self) -> None:
         if not os.path.isfile(self.source):
             raise InvalidArgumentException(
@@ -99,6 +111,10 @@ class EXECUTE(Command):
     def validate_argument_list(cls, *args: Any) -> None:
         if not len(args) >= 1:
             raise InvalidArgumentListException("EXECUTE must have at least one argument")
+
+    @classmethod
+    def help_message(cls) -> str:
+        return "Usage: EXECUTE {command} [...args]"
 
     def validate_pre_run(self) -> None:
         # nothing to validate here
@@ -127,6 +143,10 @@ class TAKE_SCREENSHOT(Command):
         # if not len(args) == 1:
         #     raise InvalidArgumentListException("TAKE_SCREENSHOT only supports one argument")
 
+    @classmethod
+    def help_message(cls) -> str:
+        return "Usage: TAKE_SCREENSHOT"
+
     def validate_pre_run(self) -> None:
         # nothing to validate here
         pass
@@ -154,6 +174,10 @@ class SEND_FILE(Command):
     def validate_argument_list(cls, *args: Any) -> None:
         if not len(args) == 2:
             raise InvalidArgumentListException("SEND_FILE only supports two arguments")
+
+    @classmethod
+    def help_message(cls) -> str:
+        return "Usage: SEND_FILE {remote_location} {local_location}"
 
     def validate_pre_run(self) -> None:
         if not os.path.isfile(self.source):
