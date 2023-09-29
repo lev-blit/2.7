@@ -1,7 +1,5 @@
-# See https://pre-commit.com for more information
-# See https://pre-commit.com/hooks.html for more hooks
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
+-   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
       - id: trailing-whitespace
@@ -12,18 +10,26 @@ repos:
       - id: file-contents-sorter
         files: dev-requirements.txt
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
+-   repo: https://github.com/asottile/setup-cfg-fmt
+    rev: v2.4.0
+    hooks:
+      - id: setup-cfg-fmt
+-   repo: https://github.com/asottile/add-trailing-comma
+    rev: v3.1.0
+    hooks:
+    -   id: add-trailing-comma
+-   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.5.1
     hooks:
       - id: mypy
 
-  - repo: https://github.com/psf/black
+-   repo: https://github.com/psf/black
     rev: 23.9.1
     hooks:
     - id: black
       language_version: python3.10
 
-  - repo: https://github.com/pycqa/flake8
+-   repo: https://github.com/pycqa/flake8
     rev: 6.1.0
     hooks:
       - id: flake8
@@ -32,7 +38,7 @@ repos:
           - flake8-comprehensions
           - flake8-simplify
 
-  - repo: https://github.com/asottile/reorder-python-imports
+-   repo: https://github.com/asottile/reorder-python-imports
     rev: v3.11.0
     hooks:
       - id: reorder-python-imports
