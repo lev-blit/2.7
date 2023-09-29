@@ -1,6 +1,8 @@
+import argparse
 import socket
 from functools import partial
 from typing import Any
+from typing import Sequence
 from typing import Type
 
 from .common import commands
@@ -18,10 +20,10 @@ from .common.protocol import validate_command
 CLIENT_TIMEOUT_SECONDS = 10
 
 
-def init_server_socket() -> socket.socket:
+def init_server_socket(port: int) -> socket.socket:
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # TODO: have the port be configurable in env/as a cli argument
-    server_socket.bind(("0.0.0.0", 8080))
+    server_socket.bind(("0.0.0.0", port))
     server_socket.listen()
 
     return server_socket
@@ -57,8 +59,17 @@ def handle_exit(client_socket: socket.socket) -> None:
     send_msg(client_socket, "Server shutting down...")
 
 
-def main() -> None:
-    server_socket = init_server_socket()
+def main(argv: Sequence[str] | None = None) -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--port",
+        help="the port for the server to listen on",
+        type=int,
+        default=8080,
+    )
+    args = parser.parse_args(argv)
+
+    server_socket = init_server_socket(args.port)
     done = False
 
     try:
