@@ -6,14 +6,9 @@ from typing import Callable
 class Command(abc.ABC):
     MULTI_STAGED = False
 
-    def __init__(self, name: str, *args: Any) -> None:
-        # XXX: is this needed?
-        self.name = name
-
-    # TODO: is it any? or is it str?
     @classmethod
     @abc.abstractmethod
-    def validate_argument_list(cls, *args: Any) -> None:
+    def validate_argument_list(cls, *args: str) -> None:
         """
         A method to validate the argument list given the command.
         This method validates the amount and type of arguments given to the command,
