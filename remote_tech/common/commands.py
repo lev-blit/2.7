@@ -15,8 +15,9 @@ from .exceptions import InvalidArgumentListException
 class Command(abc.ABC):
     MULTI_STAGED = False
 
+    @abc.abstractmethod
     def __init__(self, *args: str) -> None:
-        raise NotImplementedError
+        pass
 
     @classmethod
     @abc.abstractmethod
@@ -70,7 +71,6 @@ class Command(abc.ABC):
 
 class DIR(Command):
     def __init__(self, *args: Any) -> None:
-        super().__init__()
         self.validate_argument_list(*args)
         self.path = args[0]
 
@@ -96,7 +96,6 @@ class DIR(Command):
 
 class DELETE(Command):
     def __init__(self, *args: Any) -> None:
-        super().__init__()
         self.validate_argument_list(*args)
         self.path = args[0]
 
@@ -124,7 +123,6 @@ class DELETE(Command):
 
 class COPY(Command):
     def __init__(self, *args: Any) -> None:
-        super().__init__()
         self.validate_argument_list(*args)
         self.source, self.dest = args
 
@@ -159,7 +157,6 @@ class COPY(Command):
 
 class EXECUTE(Command):
     def __init__(self, *args: Any) -> None:
-        super().__init__()
         self.validate_argument_list(*args)
         self.command = args
 
@@ -189,7 +186,6 @@ class EXECUTE(Command):
 
 class TAKE_SCREENSHOT(Command):
     def __init__(self, *args: Any) -> None:
-        super().__init__()
         self.validate_argument_list(*args)
         self.screenshot_path = "screenshot.jpg"
 
@@ -220,7 +216,6 @@ class SEND_FILE(Command):
     MULTI_STAGED = True
 
     def __init__(self, *args: Any) -> None:
-        super().__init__()
         self.validate_argument_list(*args)
         self.source, self.dest = args
         self.file_size: int = -1
