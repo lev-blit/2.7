@@ -4,8 +4,8 @@ from typing import Any
 from typing import Callable
 from typing import Type
 
+from common.commands import Command
 from common.exceptions import InvalidArgumentListException
-from common.types import Command
 
 
 def _try_recv_until_timeout(s: socket.socket, amount: int) -> tuple[bool, bytes]:
