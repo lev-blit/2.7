@@ -1,3 +1,4 @@
+import socket
 import subprocess
 import sys
 from typing import Iterator
@@ -20,3 +21,10 @@ def server_process(server_port: int) -> Iterator[subprocess.Popen[bytes]]:
     yield process
     if process.returncode is None:
         process.terminate()
+
+
+@pytest.fixture
+def client_socket(server_port: int) -> socket.socket:
+    s = socket.socket()
+    s.connect(("127.0.0.1", server_port))
+    return s

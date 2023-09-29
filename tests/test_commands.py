@@ -28,12 +28,10 @@ from remote_tech.common.protocol import send_msg
 def test_invalid_argument_list(
     command_message: str,
     expected_response: str,
-    server_port: int,
+    client_socket: socket.socket,
 ) -> None:
-    s = socket.socket()
-    s.connect(("127.0.0.1", server_port))
-    send_msg(s, command_message)
-    assert get_msg(s) == (True, expected_response)
+    send_msg(client_socket, command_message)
+    assert get_msg(client_socket) == (True, expected_response)
 
 
 @pytest.mark.usefixtures("server_process")
