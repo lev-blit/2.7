@@ -45,7 +45,7 @@ def receive_new_command(
     if not success:
         print(f"Received invalid message={message.decode()}")
         send_msg(client_socket, "Invalid message sent")
-        client_socket.close()
+        client_socket.shutdown(socket.SHUT_WR)
         return None, "", []
 
     print(f"Received message={message.decode()}")
