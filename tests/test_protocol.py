@@ -4,10 +4,10 @@ from typing import Any
 
 import pytest
 
-from common.commands import Command
-from common.exceptions import InvalidArgumentListException
-from common.protocol import parse_command
-from common.protocol import validate_command
+from remote_tech.common.commands import Command
+from remote_tech.common.exceptions import InvalidArgumentListException
+from remote_tech.common.protocol import parse_command
+from remote_tech.common.protocol import validate_command
 
 
 @pytest.mark.parametrize(
@@ -48,7 +48,9 @@ class MOCK_COMMAND(Command):
     ),
 )
 def test_validate_command(
-    command_name: str, args: list[str], expected_value: tuple[bool, type[Command] | None]
+    command_name: str,
+    args: list[str],
+    expected_value: tuple[bool, type[Command] | None],
 ) -> None:
     ret = validate_command(
         command_name,
@@ -60,7 +62,7 @@ def test_validate_command(
     assert ret == expected_value
 
 
-def test_validate_command_invalid_command_callback():
+def test_validate_command_invalid_command_callback() -> None:
     sio = io.StringIO()
     validate_command(
         "invalid_command",
@@ -73,7 +75,7 @@ def test_validate_command_invalid_command_callback():
     assert sio.getvalue() == "Received invalid command - invalid_command\n"
 
 
-def test_validate_command_invalid_argument_callback():
+def test_validate_command_invalid_argument_callback() -> None:
     sio = io.StringIO()
     validate_command(
         "MOCK_COMMAND",

@@ -8,8 +8,8 @@ from typing import Callable
 
 import pyautogui
 
-from common.exceptions import InvalidArgumentException
-from common.exceptions import InvalidArgumentListException
+from remote_tech.common.exceptions import InvalidArgumentException
+from remote_tech.common.exceptions import InvalidArgumentListException
 
 
 class Command(abc.ABC):
@@ -86,7 +86,7 @@ class DIR(Command):
     def validate_pre_run(self) -> None:
         if not os.path.isdir(self.path):
             raise InvalidArgumentException(
-                f'The given path argument "{self.path}" is not a directory'
+                f'The given path argument "{self.path}" is not a directory',
             )
 
     def run(self) -> list[str]:
@@ -135,7 +135,7 @@ class COPY(Command):
         source, dest = args
         if source == dest:
             raise InvalidArgumentListException(
-                "Dest argument must be different from source argument"
+                "Dest argument must be different from source argument",
             )
 
     @classmethod
@@ -145,7 +145,7 @@ class COPY(Command):
     def validate_pre_run(self) -> None:
         if not os.path.isfile(self.source):
             raise InvalidArgumentException(
-                f'The given source argument "{self.source}" is not a file'
+                f'The given source argument "{self.source}" is not a file',
             )
 
     def run(self) -> str:
@@ -237,7 +237,7 @@ class SEND_FILE(Command):
     def validate_pre_run(self) -> None:
         if not os.path.isfile(self.source):
             raise InvalidArgumentException(
-                f'The given source argument "{self.source}" is not a file'
+                f'The given source argument "{self.source}" is not a file',
             )
 
     def run(self) -> None:

@@ -6,9 +6,11 @@ import pytest
 
 
 @pytest.fixture()
-def server_process() -> Iterator[subprocess.Popen]:
+def server_process() -> Iterator[subprocess.Popen[bytes]]:
     process = subprocess.Popen(
-        [sys.executable, "../server/server.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        [sys.executable, "-m", "remote_tech.server"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
     )
     yield process
     if process.returncode is None:

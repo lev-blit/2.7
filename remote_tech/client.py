@@ -1,12 +1,12 @@
 import socket
 from functools import partial
 
-from common import commands
-from common.protocol import get_msg
-from common.protocol import parse_command
-from common.protocol import recv_custom_amount
-from common.protocol import send_msg
-from common.protocol import validate_command
+from .common import commands
+from .common.protocol import get_msg
+from .common.protocol import parse_command
+from .common.protocol import recv_custom_amount
+from .common.protocol import send_msg
+from .common.protocol import validate_command
 
 # TODO: have this be an arg to running the client to be able to control which server to connect to
 SERVER_IP = "127.0.0.1"

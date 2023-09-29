@@ -3,8 +3,8 @@ import subprocess
 
 import pytest
 
-from common.protocol import get_msg
-from common.protocol import send_msg
+from remote_tech.common.protocol import get_msg
+from remote_tech.common.protocol import send_msg
 
 
 @pytest.mark.usefixtures("server_process")

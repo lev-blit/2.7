@@ -3,13 +3,13 @@ from functools import partial
 from typing import Any
 from typing import Type
 
-from common import commands
-from common.commands import Command
-from common.exceptions import InvalidArgumentException
-from common.protocol import get_msg
-from common.protocol import parse_command
-from common.protocol import send_msg
-from common.protocol import validate_command
+from remote_tech.common import commands
+from remote_tech.common.commands import Command
+from remote_tech.common.exceptions import InvalidArgumentException
+from remote_tech.common.protocol import get_msg
+from remote_tech.common.protocol import parse_command
+from remote_tech.common.protocol import send_msg
+from remote_tech.common.protocol import validate_command
 
 # TODO: change to relative/package? have a common package?
 
