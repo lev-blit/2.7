@@ -8,6 +8,35 @@ from remote_tech.common.protocol import send_msg
 
 
 @pytest.mark.usefixtures("server_process")
+@pytest.mark.parametrize(
+    ("command_message", "expected_response"),
+    (
+        ("DIR", b"DIR only supports one argument\nUsage: DIR {directory_name}"),
+        ("DELETE", b"DELETE only supports one argument\nUsage: DELETE {file_name}"),
+        ("COPY", b"COPY only supports two arguments\nUsage: COPY {src_file} {dst_location}"),
+        ("EXECUTE", b"EXECUTE must have at least one argument\nUsage: EXECUTE {command} [...args]"),
+        (
+            "TAKE_SCREENSHOT invalid",
+            b"TAKE_SCREENSHOT doesn't accept arguments\nUsage: TAKE_SCREENSHOT",
+        ),
+        (
+            "SEND_FILE",
+            b"SEND_FILE only supports two arguments\nUsage: SEND_FILE {remote_location} {local_location}",  # noqa: E501
+        ),
+    ),
+)
+def test_invalid_argument_list(
+    command_message: str,
+    expected_response: str,
+    server_port: int,
+) -> None:
+    s = socket.socket()
+    s.connect(("127.0.0.1", server_port))
+    send_msg(s, command_message)
+    assert get_msg(s) == (True, expected_response)
+
+
+@pytest.mark.usefixtures("server_process")
 def test_dir(server_port: int) -> None:
     s = socket.socket()
     s.connect(("127.0.0.1", server_port))
