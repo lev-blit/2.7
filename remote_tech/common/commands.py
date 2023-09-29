@@ -8,8 +8,8 @@ from typing import Callable
 
 import pyautogui
 
-from remote_tech.common.exceptions import InvalidArgumentException
-from remote_tech.common.exceptions import InvalidArgumentListException
+from .exceptions import InvalidArgumentException
+from .exceptions import InvalidArgumentListException
 
 
 class Command(abc.ABC):
