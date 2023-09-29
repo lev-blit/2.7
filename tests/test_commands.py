@@ -1,3 +1,4 @@
+import os
 import socket
 import tempfile
 
@@ -50,3 +51,20 @@ def test_dir(server_port: int) -> None:
         s.connect(("127.0.0.1", server_port))
         send_msg(s, f"DIR {tmpdir}")
         assert get_msg(s) == (True, f"{files_list}".encode())
+
+
+@pytest.mark.usefixtures("server_process")
+def test_delete(server_port: int) -> None:
+    s = socket.socket()
+    s.connect(("127.0.0.1", server_port))
+    with tempfile.TemporaryDirectory() as tmpdir:
+        file_path = rf"{tmpdir}\file.txt"
+        open(file_path, "w").close()
+        send_msg(s, f"DELETE {file_path}")
+        assert get_msg(s) == (True, f"Successfully deleted {file_path}".encode())
+        assert not os.path.isfile(file_path)
+
+        s = socket.socket()
+        s.connect(("127.0.0.1", server_port))
+        send_msg(s, f"DELETE {file_path}")
+        assert get_msg(s) == (True, f'The given path argument "{file_path}" is not a file'.encode())
