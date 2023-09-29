@@ -23,8 +23,12 @@ def server_process(server_port: int) -> Iterator[subprocess.Popen[bytes]]:
         process.terminate()
 
 
-@pytest.fixture
-def client_socket(server_port: int) -> socket.socket:
+def client_socket(port: int) -> socket.socket:
     s = socket.socket()
-    s.connect(("127.0.0.1", server_port))
+    s.connect(("127.0.0.1", port))
     return s
+
+
+@pytest.fixture
+def client_socket_fixture(server_port: int) -> socket.socket:
+    return client_socket(server_port)

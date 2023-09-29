@@ -3,6 +3,7 @@ import socket
 import tempfile
 
 import pytest
+from conftest import client_socket
 
 from remote_tech.common.protocol import get_msg
 from remote_tech.common.protocol import send_msg
@@ -29,17 +30,16 @@ from remote_tech.common.protocol import send_msg
 def test_invalid_argument_list(
     command_message: str,
     expected_response: str,
-    client_socket: socket.socket,
+    client_socket_fixt: socket.socket,
 ) -> None:
-    send_msg(client_socket, command_message)
-    assert get_msg(client_socket) == (True, expected_response)
+    send_msg(client_socket_fixt, command_message)
+    assert get_msg(client_socket_fixt) == (True, expected_response)
 
 
 @pytest.mark.usefixtures("server_process")
 def test_dir(server_port: int) -> None:
-    s = socket.socket()
-    s.connect(("127.0.0.1", server_port))
     with tempfile.TemporaryDirectory() as tmpdir:
+        s = client_socket(server_port)
         send_msg(s, f"DIR {tmpdir}")
         assert get_msg(s) == (True, b"[]")
 
@@ -47,24 +47,21 @@ def test_dir(server_port: int) -> None:
         for filename in files_list:
             open(filename, "w").close()
 
-        s = socket.socket()
-        s.connect(("127.0.0.1", server_port))
+        s = client_socket(server_port)
         send_msg(s, f"DIR {tmpdir}")
         assert get_msg(s) == (True, f"{files_list}".encode())
 
 
 @pytest.mark.usefixtures("server_process")
 def test_delete(server_port: int) -> None:
-    s = socket.socket()
-    s.connect(("127.0.0.1", server_port))
     with tempfile.TemporaryDirectory() as tmpdir:
         file_path = rf"{tmpdir}\file.txt"
         open(file_path, "w").close()
+        s = client_socket(server_port)
         send_msg(s, f"DELETE {file_path}")
         assert get_msg(s) == (True, f"Successfully deleted {file_path}".encode())
         assert not os.path.isfile(file_path)
 
-        s = socket.socket()
-        s.connect(("127.0.0.1", server_port))
+        s = client_socket(server_port)
         send_msg(s, f"DELETE {file_path}")
         assert get_msg(s) == (True, f'The given path argument "{file_path}" is not a file'.encode())
