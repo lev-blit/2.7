@@ -40,8 +40,12 @@ def test_invalid_argument_list(
 def test_dir(server_port: int) -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         s = client_socket(server_port)
-        send_msg(s, f"DIR {tmpdir}")
-        assert get_msg(s) == (True, b"[]")
+        file_path = f"{tmpdir}/file.txt"
+        send_msg(s, f"DIR {file_path}")
+        assert get_msg(s) == (
+            True,
+            f'The given path argument "{file_path}" is not a directory'.encode(),
+        )
 
         files_list = [rf"{tmpdir}\t.txt", rf"{tmpdir}\t2.txt"]
         for filename in files_list:
