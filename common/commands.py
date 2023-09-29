@@ -1,3 +1,4 @@
+import abc
 import glob
 import os
 import shutil
@@ -9,12 +10,67 @@ import pyautogui
 
 from common.exceptions import InvalidArgumentException
 from common.exceptions import InvalidArgumentListException
-from common.types import Command
+
+
+class Command(abc.ABC):
+    MULTI_STAGED = False
+
+    def __init__(self, *args: str) -> None:
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def validate_argument_list(cls, *args: str) -> None:
+        """
+        A method to validate the argument list given the command.
+        This method validates the amount and type of arguments given to the command,
+        not whether the arguments themselves are valid for the command being run on a server.
+        This method should be used both in clients and in servers.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def help_message(cls) -> str:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def validate_pre_run(self) -> None:
+        """
+        A method to validate to specific arguments and not just their amount and type.
+        This should be used only when running the command, while `validate_argument_list` can be
+        used to validate the command on clients before sending it a server to execute.
+        This method should only be run on a server, before calling the `run` method.
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def run(self) -> Any:
+        """Runs the command and returns a tuple of [success, result]"""
+        raise NotImplementedError
+
+    if MULTI_STAGED:
+
+        @abc.abstractmethod
+        def multi_stage_send(
+            self,
+            send_with_len_callback: Callable[[Any], None],
+            pure_send_callback: Callable[[Any], None],
+        ) -> Any:
+            raise NotImplementedError
+
+        @abc.abstractmethod
+        def multi_stage_recv(
+            self,
+            get_msg_callback: Callable[[], tuple[bool, bytes]],
+            recv_callback: Callable[[int], tuple[bool, bytes]],
+        ) -> tuple[bool, bytes]:
+            raise NotImplementedError
 
 
 class DIR(Command):
     def __init__(self, *args: Any) -> None:
-        super().__init__("DIR")
+        super().__init__()
         self.validate_argument_list(*args)
         self.path = args[0]
 
@@ -40,7 +96,7 @@ class DIR(Command):
 
 class DELETE(Command):
     def __init__(self, *args: Any) -> None:
-        super().__init__("DELETE")
+        super().__init__()
         self.validate_argument_list(*args)
         self.path = args[0]
 
@@ -68,7 +124,7 @@ class DELETE(Command):
 
 class COPY(Command):
     def __init__(self, *args: Any) -> None:
-        super().__init__("COPY")
+        super().__init__()
         self.validate_argument_list(*args)
         self.source, self.dest = args
 
@@ -103,7 +159,7 @@ class COPY(Command):
 
 class EXECUTE(Command):
     def __init__(self, *args: Any) -> None:
-        super().__init__("EXECUTE")
+        super().__init__()
         self.validate_argument_list(*args)
         self.command = args
 
@@ -133,7 +189,7 @@ class EXECUTE(Command):
 
 class TAKE_SCREENSHOT(Command):
     def __init__(self, *args: Any) -> None:
-        super().__init__("TAKE_SCREENSHOT")
+        super().__init__()
         self.validate_argument_list(*args)
         self.screenshot_path = "screenshot.jpg"
 
@@ -164,7 +220,7 @@ class SEND_FILE(Command):
     MULTI_STAGED = True
 
     def __init__(self, *args: Any) -> None:
-        super().__init__("SEND_FILE")
+        super().__init__()
         self.validate_argument_list(*args)
         self.source, self.dest = args
         self.file_size: int = -1
