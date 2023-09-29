@@ -30,10 +30,10 @@ from remote_tech.common.protocol import send_msg
 def test_invalid_argument_list(
     command_message: str,
     expected_response: str,
-    client_socket_fixt: socket.socket,
+    client_socket_fixture: socket.socket,
 ) -> None:
-    send_msg(client_socket_fixt, command_message)
-    assert get_msg(client_socket_fixt) == (True, expected_response)
+    send_msg(client_socket_fixture, command_message)
+    assert get_msg(client_socket_fixture) == (True, expected_response)
 
 
 @pytest.mark.usefixtures("server_process")
