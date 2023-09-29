@@ -25,6 +25,7 @@ def init_server_socket(port: int) -> socket.socket:
     # TODO: have the port be configurable in env/as a cli argument
     server_socket.bind(("0.0.0.0", port))
     server_socket.listen()
+    print(f"Starting server, listening on port {port}")
 
     return server_socket
 
