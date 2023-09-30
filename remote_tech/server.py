@@ -14,10 +14,6 @@ from .common.protocol import send_msg
 from .common.protocol import validate_command
 
 
-# TODO: have this be configurable in env/as a cli argument
-CLIENT_TIMEOUT_SECONDS = 10
-
-
 def init_server_socket(port: int) -> socket.socket:
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind(("0.0.0.0", port))
@@ -37,9 +33,10 @@ def run_client_command(command_class: Type[Command], arguments: list[str]) -> An
 
 def receive_new_command(
     server_socket: socket.socket,
+    client_timeout_seconds: float,
 ) -> tuple[socket.socket | None, str, list[str]]:
     client_socket, client_address = server_socket.accept()
-    client_socket.settimeout(CLIENT_TIMEOUT_SECONDS)
+    client_socket.settimeout(client_timeout_seconds)
     print(f"Received new connection from {client_address}")
     success, message = get_msg(client_socket)
     if not success:
@@ -65,6 +62,12 @@ def main(argv: Sequence[str] | None = None) -> None:
         type=int,
         default=8080,
     )
+    parser.add_argument(
+        "--client-timeout-seconds",
+        help="timeout for client sockets in seconds",
+        type=float,
+        default=10,
+    )
     args = parser.parse_args(argv)
 
     server_socket = init_server_socket(args.port)
@@ -72,7 +75,10 @@ def main(argv: Sequence[str] | None = None) -> None:
 
     try:
         while not done:
-            client_socket, command_name, arguments = receive_new_command(server_socket)
+            client_socket, command_name, arguments = receive_new_command(
+                server_socket,
+                args.client_timeout_seconds,
+            )
             if client_socket is None:
                 continue
 
