@@ -13,8 +13,6 @@ from .common.protocol import parse_command
 from .common.protocol import send_msg
 from .common.protocol import validate_command
 
-# TODO: change to relative/package? have a common package?
-
 
 # TODO: have this be configurable in env/as a cli argument
 CLIENT_TIMEOUT_SECONDS = 10
@@ -22,7 +20,6 @@ CLIENT_TIMEOUT_SECONDS = 10
 
 def init_server_socket(port: int) -> socket.socket:
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # TODO: have the port be configurable in env/as a cli argument
     server_socket.bind(("0.0.0.0", port))
     server_socket.listen()
     print(f"Starting server, listening on port {port}")
