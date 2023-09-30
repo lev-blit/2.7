@@ -11,7 +11,7 @@ from remote_tech.common.protocol import recv_custom_amount
 from remote_tech.common.protocol import send_msg
 
 
-@pytest.mark.usefixtures("server_process")
+@pytest.mark.usefixtures("server_process_tmpdir")
 @pytest.mark.parametrize(
     ("command_message", "expected_response"),
     (
@@ -38,7 +38,7 @@ def test_invalid_argument_list(
     assert get_msg(client_socket_fixture) == (True, expected_response)
 
 
-@pytest.mark.usefixtures("server_process")
+@pytest.mark.usefixtures("server_process_tmpdir")
 def test_dir(server_port: int) -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         s = client_socket(server_port)
@@ -58,7 +58,7 @@ def test_dir(server_port: int) -> None:
         assert get_msg(s) == (True, f"{files_list}".encode())
 
 
-@pytest.mark.usefixtures("server_process")
+@pytest.mark.usefixtures("server_process_tmpdir")
 def test_delete(server_port: int) -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         file_path = rf"{tmpdir}\file.txt"
@@ -73,7 +73,7 @@ def test_delete(server_port: int) -> None:
         assert get_msg(s) == (True, f'The given path argument "{file_path}" is not a file'.encode())
 
 
-@pytest.mark.usefixtures("server_process")
+@pytest.mark.usefixtures("server_process_tmpdir")
 def test_copy(server_port: int) -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         src_path = rf"{tmpdir}\src.txt"
@@ -96,7 +96,7 @@ def test_copy(server_port: int) -> None:
         )
 
 
-@pytest.mark.usefixtures("server_process")
+@pytest.mark.usefixtures("server_process_tmpdir")
 def test_execute(client_socket_fixture: socket.socket) -> None:
     command = "python -c exit(3)"
     send_msg(client_socket_fixture, f"EXECUTE {command}")
