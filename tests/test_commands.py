@@ -7,6 +7,7 @@ import pytest
 from conftest import client_socket
 
 from remote_tech.common.protocol import get_msg
+from remote_tech.common.protocol import recv_custom_amount
 from remote_tech.common.protocol import send_msg
 
 
@@ -109,6 +110,22 @@ def test_take_screenshot(
     server_process_tmpdir: tuple[subprocess.Popen[bytes], str],
     client_socket_fixture: socket.socket,
 ) -> None:
+    _, tmpdir = server_process_tmpdir
     send_msg(client_socket_fixture, "TAKE_SCREENSHOT")
     assert get_msg(client_socket_fixture) == (True, b"Screenshot saved to screenshot.jpg")
-    assert os.path.isfile(rf"{server_process_tmpdir[1]}\screenshot.jpg")
+    assert os.path.isfile(rf"{tmpdir}\screenshot.jpg")
+
+
+def test_send_file(
+    server_process_tmpdir: tuple[subprocess.Popen[bytes], str],
+    client_socket_fixture: socket.socket,
+) -> None:
+    _, tmpdir = server_process_tmpdir
+    src_path = rf"{tmpdir}\src.txt"
+    dst_path = rf"{tmpdir}\dst.txt"
+    data = "file_content"
+    with open(src_path, "w") as f:
+        f.write(data)
+    send_msg(client_socket_fixture, f"SEND_FILE {src_path} {dst_path}")
+    assert get_msg(client_socket_fixture) == (True, b"12")
+    assert recv_custom_amount(client_socket_fixture, 12) == (True, data.encode())
