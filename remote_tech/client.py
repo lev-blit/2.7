@@ -1,5 +1,7 @@
+import argparse
 import socket
 from functools import partial
+from typing import Sequence
 
 from .common import commands
 from .common.protocol import get_msg
@@ -8,10 +10,6 @@ from .common.protocol import recv_custom_amount
 from .common.protocol import send_msg
 from .common.protocol import validate_command
 
-# TODO: have this be an arg to running the client to be able to control which server to connect to
-SERVER_IP = "127.0.0.1"
-SERVER_PORT = 8080
-
 
 def get_server_socket(ip: str, port: int) -> socket.socket:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -19,7 +17,22 @@ def get_server_socket(ip: str, port: int) -> socket.socket:
     return sock
 
 
-def main() -> None:
+def main(argv: Sequence[str] | None = None) -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--server-port",
+        help="the port to connect to on the server",
+        type=int,
+        dest="server_port",
+        default=8080,
+    )
+    parser.add_argument(
+        "--server-ip",
+        help="the ip of the server",
+        dest="server_ip",
+        default="127.0.0.1",
+    )
+    args = parser.parse_args(argv)
     done = False
 
     try:
@@ -39,7 +52,7 @@ def main() -> None:
             else:
                 command_class = None
 
-            sock = get_server_socket(SERVER_IP, SERVER_PORT)
+            sock = get_server_socket(args.server_ip, args.server_port)
             send_msg(sock, message)
             if command_class is not None and command_class.MULTI_STAGED:
                 success, response = command_class(*arguments).multi_stage_recv(
