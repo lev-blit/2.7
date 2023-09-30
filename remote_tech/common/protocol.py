@@ -20,7 +20,6 @@ def get_msg(s: socket.socket) -> tuple[bool, bytes]:
     success, length_str = recv_custom_amount(s, 4)
 
     if not success or not length_str.isdigit():
-        # TODO: return invalid length received
         # TODO: cleanup socket?
         return False, length_str
 
