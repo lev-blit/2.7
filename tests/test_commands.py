@@ -92,3 +92,13 @@ def test_copy(server_port: int) -> None:
             True,
             rf'The given source argument "{tmpdir}\invalidpath.txt" is not a file'.encode(),
         )
+
+
+@pytest.mark.usefixtures("server_process")
+def test_execute(client_socket_fixture: socket.socket) -> None:
+    command = "python -c exit(3)"
+    send_msg(client_socket_fixture, f"EXECUTE {command}")
+    assert get_msg(client_socket_fixture) == (
+        True,
+        f"{tuple(command.split())} exited with exit code 3".encode(),
+    )
