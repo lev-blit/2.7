@@ -1,5 +1,6 @@
 import os
 import socket
+import subprocess
 import tempfile
 
 import pytest
@@ -102,3 +103,12 @@ def test_execute(client_socket_fixture: socket.socket) -> None:
         True,
         f"{tuple(command.split())} exited with exit code 3".encode(),
     )
+
+
+def test_take_screenshot(
+    server_process_tmpdir: tuple[subprocess.Popen[bytes], str],
+    client_socket_fixture: socket.socket,
+) -> None:
+    send_msg(client_socket_fixture, "TAKE_SCREENSHOT")
+    assert get_msg(client_socket_fixture) == (True, b"Screenshot saved to screenshot.jpg")
+    assert os.path.isfile(rf"{server_process_tmpdir[1]}\screenshot.jpg")

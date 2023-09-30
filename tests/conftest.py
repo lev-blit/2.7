@@ -1,6 +1,8 @@
+import os
 import socket
 import subprocess
 import sys
+import tempfile
 from typing import Iterator
 
 import pytest
@@ -21,6 +23,22 @@ def server_process(server_port: int) -> Iterator[subprocess.Popen[bytes]]:
     yield process
     if process.returncode is None:
         process.terminate()
+
+
+@pytest.fixture
+def server_process_tmpdir(server_port: int) -> Iterator[tuple[subprocess.Popen[bytes], str]]:
+    old_path = os.getcwd()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        os.chdir(tmpdir)
+        process = subprocess.Popen(
+            [sys.executable, "-m", "remote_tech.server", "--port", str(server_port)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        yield process, tmpdir
+        os.chdir(old_path)
+        if process.returncode is None:
+            process.terminate()
 
 
 def client_socket(port: int) -> socket.socket:
