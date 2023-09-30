@@ -152,7 +152,7 @@ class COPY(Command):
             shutil.copy(self.source, self.dest)
         except OSError as e:
             return str(e)
-        return f"Successfully {self.source} to {self.dest}"
+        return f"Successfully copied {self.source} to {self.dest}"
 
 
 class EXECUTE(Command):

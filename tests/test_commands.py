@@ -69,3 +69,26 @@ def test_delete(server_port: int) -> None:
         s = client_socket(server_port)
         send_msg(s, f"DELETE {file_path}")
         assert get_msg(s) == (True, f'The given path argument "{file_path}" is not a file'.encode())
+
+
+@pytest.mark.usefixtures("server_process")
+def test_copy(server_port: int) -> None:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        src_path = rf"{tmpdir}\src.txt"
+        dest_path = rf"{tmpdir}\dst.txt"
+        data = "file_data"
+        with open(src_path, "w") as f:
+            f.write(data)
+        s = client_socket(server_port)
+        send_msg(s, f"COPY {src_path} {dest_path}")
+        assert get_msg(s) == (True, f"Successfully copied {src_path} to {dest_path}".encode())
+        assert os.path.isfile(dest_path)
+        with open(dest_path) as f:
+            assert f.read() == data
+
+        s = client_socket(server_port)
+        send_msg(s, rf"COPY {tmpdir}\invalidpath.txt {tmpdir}\something.txt")
+        assert get_msg(s) == (
+            True,
+            rf'The given source argument "{tmpdir}\invalidpath.txt" is not a file'.encode(),
+        )
