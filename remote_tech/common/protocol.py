@@ -52,7 +52,7 @@ def parse_command(message: str) -> tuple[str, list[str]]:
     # TODO: given the string 'EXECUTE python -c "import sys; print(sys.version_info)", VVVV
     #  return 'EXECUTE', ['python', '-c', 'import sys; print(sys.version_info)']
     #  same with '' instead of ""
-    #  ^^ could probably implemented with sending "len(arg)arg" for each arg instead of just the entire data
+    #  ^^ could probably implemented with sending "len(arg)arg" for each arg instead of just the entire data  # noqa: E501
     split_message = message.split(" ")
     if len(split_message) == 0:
         return "", []
